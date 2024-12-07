@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Name List</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { padding: 10px; text-align: left; border: 1px solid #ddd; }
+    th { background-color: #f4f4f4; }
+    .search-bar { margin-bottom: 20px; }
+    button { padding: 5px 10px; background-color: #d9534f; color: white; border: none; cursor: pointer; }
+    button:hover { background-color: #c9302c; }
+    .add-button { background-color: #4CAF50; }
+    .add-button:hover { background-color: #45a049; }
+  </style>
+</head>
+<body>
+  <h1>Name List</h1>
+  <input type="text" id="searchBar" class="search-bar" placeholder="Search for a name...">
+  <table id="nameTable">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>الاعتراف</th>
+        <th>التناول</th>
+        <th>حضور القداس</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+  <button class="add-button" onclick="goToHome()">Add Another Name</button>
+
+  <script>
+    const nameTableBody = document.querySelector('#nameTable tbody');
+    const searchBar = document.getElementById('searchBar');
+
+    // Load names from localStorage and populate the table
+    function loadNames() {
+      const users = JSON.parse(localStorage.getItem('users')) || [];
+      nameTableBody.innerHTML = '';
+
+      users.forEach((user, index) => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td><a href="details.html?id=${index}" style="text-decoration: none; color: blue;">${user.name}</a></td>
+          <td><input type="radio" name="confession${index}" value="true"></td>
+          <td><input type="radio" name="communion${index}" value="true"></td>
+          <td><input type="radio" name="mass${index}" value="true"></td>
+          <td>
+            <button onclick="deleteName(${index})">Delete</button>
+          </td>
+        `;
+        nameTableBody.appendChild(row);
+      });
+    }
+
+    // Delete a user and refresh the table
+    function deleteName(index) {
+      let users = JSON.parse(localStorage.getItem('users')) || [];
+      users.splice(index, 1);
+      localStorage.setItem('users', JSON.stringify(users));
+      loadNames(); // Reload the table
+    }
+
+    // Redirect to the registration page
+    function goToHome() {
+      window.location.href = 'church.html';
+    }
+
+    // Search functionality
+    searchBar.addEventListener('input', (e) => {
+      const searchTerm = e.target.value.toLowerCase();
+      const rows = nameTableBody.querySelectorAll('tr');
+
+      rows.forEach(row => {
+        const name = row.querySelector('td a').innerText.toLowerCase();
+        row.style.display = name.includes(searchTerm) ? '' : 'none';
+      });
+    });
+
+    // Initialize the table on page load
+    loadNames();
+  </script>
+</body>
+</html>
